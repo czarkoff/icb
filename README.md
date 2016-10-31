@@ -25,8 +25,7 @@ The following flags are available:
 | :--- | :--- |
 | `-c status` | If login will result in creation of a group, set its status to *status*. |
 | `-d dir` | Use *dir* instead of default *~/icb* for program's directory tree. |
-| `-e` | Use “exteded packets” extension to ICB protocol. |
-| | In this mode `icb` will not split message into smaller messages, but will send it in multiple packets with length 0. |
+| `-e` | Use “exteded packets” extension to ICB protocol. In this mode `icb` will not split message into smaller messages, but will send it in multiple packets with length 0. |
 | `-k env` | Get ICB account's password from *env* environment variable. |
 | `-l login` | Use *login* for login name when connecting. Defaults to system user name. |
 | `-n nick` | Set nick name to *nick*. Defaults to login name. |
@@ -66,8 +65,3 @@ CAVEATS
     cases.  Use with care.
  -  Due to program design and limitations of ICB protocol one `icb` instance can
     only deal with one group.
-
-AUTHOR
-======
-
-Dmitrij D. Czarkoff

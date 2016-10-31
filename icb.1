@@ -1,0 +1,136 @@
+.\" Copyright (c) 2016, Dmitrij D. Czarkoff
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: October 31 2016$
+.Dt ICB 1
+.Os
+.Sh NAME
+.Nm icb
+.Nd Internet Citizen's Band client
+.Sh SYNOPSIS
+.Nm
+.Op Fl eV
+.Op Fl c Ar status
+.Op Fl d Ar dir
+.Op Fl k Ar env
+.Op Fl l Ar login
+.Op Fl n Ar nick
+.Ar group
+.Sh DESCRIPTION
+.Nm
+is a minimalistic FIFO- and filesystem-based Internet Citizen's Band
+.Pq ICB
+client.
+It creates an
+.Pa icb
+directory with subdirectory for ICB server, where subdirectries for group and
+nick name directories.
+In the leaf directories a FIFO file
+.Pa in
+and and normal file
+.Pa out
+are placed.
+The
+.Pa in
+file is used to communicate with the server and the
+.Pa out
+file contains the chat log.
+For every nick name there will be new
+.Pa in
+and
+.Pa out
+files.
+The basic idea of this is to be able to communicate with an ICB server with
+basic command line tools.
+.Pp
+.Nm
+lacks its own networking support.
+It relies on UCSPI-compliant network client instead.
+.Pp
+The following flags are available:
+.Bl -tag -width indent
+.It Fl c Ar status
+If login will result in creation of a group, set its status to
+.Ar status .
+.It Fl d Ar dir
+Use
+.Ar dir
+instead of default
+.Pa ~/icb
+for program's directory tree.
+.It Fl e
+Use 
+.Dq exteded packets
+extension to ICB protocol.
+In this mode
+.Nm
+will not split message into smaller messages, but will send it in multiple
+packets with length 0.
+.Fl k Ar env
+Get ICB account's password from
+.Ar env
+environment variable.
+.It Fl l Ar login
+Use
+.Ar login
+for login name when connecting.
+Defaults to system user name.
+.It Fl n Ar nick
+Set nick name to
+.Ar nick .
+Defaults to login name.
+.It Fl V
+Show version information and exit.
+.El
+.Pp
+Following commands are interpreted specially when recieved from group FIFO:
+.Bl -tag -width indent
+.It Cm :m Ar user
+Send personal message to 
+.Ar user .
+.It Cm :c Ar command
+Send
+.Ar command
+to server.
+.It Cm :p
+Ping server.
+.It Cm :q
+Quit chat.
+.El
+.Sh EXAMPLES
+Connect to local ICB server and enter group
+.Sq users ,
+send public message followed by a private message to
+.Sq root :
+.Bd -literal -offset indent
+$ tcpclient localhost icb icb users &
+$ echo hello, world! > ~/icb/localhost/\#users/in
+$ echo :m root hi > ~/icb/localhost/\#users/in
+.Ed
+.Sh SEE ALSO
+.Xr ii 1 ,
+.Xr tcpopen 1
+.Sh CAVEATS
+.Bl -bullet
+.It
+ICB is not a well-defined protocol.
+Things may not work properly in all cases.
+Use with care.
+.It
+Due to program design and limitations of ICB protocol one
+.Nm
+instance can only deal with one group.
+.El
+.Sh AUTHOR
+.An Dmitrij D. Czarkoff Aq czarkoff@gmail.com .
