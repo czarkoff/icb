@@ -230,6 +230,8 @@ init_chat(const char *name)
 {
 	struct chat *c;
 	char infile[PATH_MAX];
+	char outfile[PATH_MAX];
+	int fd;
 
 	if (strnlen(name, PKT_SZ) >= PKT_SZ) {
 		errno = ENAMETOOLONG;
@@ -257,7 +259,8 @@ init_chat(const char *name)
 		return NULL;
 	}
 
-	if (snprintf(infile, PATH_MAX, "%s/in", c->path) >= PATH_MAX) {
+	(void)snprintf(infile, PATH_MAX, "%s/in", c->path);
+	if (snprintf(outfile, PATH_MAX, "%s/out", c->path) >= PATH_MAX) {
 		errno = ENAMETOOLONG;
 		free(c);
 		return NULL;
@@ -273,6 +276,9 @@ init_chat(const char *name)
 		free(c);
 		return NULL;
 	}
+
+	/* create output file and close it immediately */
+	close(open(outfile, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR));
 
 	c->next = NULL;
 	
@@ -415,7 +421,7 @@ print_chat(char *name, char *msg)
 	if (snprintf(file, PATH_MAX, "%s/out", c->path) >= PATH_MAX)
 		return -1;
 
-	fd = open(file, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+	fd = open(file, O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR);
 	if (fd == -1)
 		return -1;
 
