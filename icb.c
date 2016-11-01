@@ -50,7 +50,6 @@ void print_command(char *);
 void send_command(char *);
 int send_msg(int, char *);
 void soft_quit(int);
-void usage(int);
 
 
 struct chat *chats = NULL;
@@ -634,15 +633,6 @@ soft_quit(int signal)
 }
 
 
-void
-usage(int ret)
-{
-	fprintf(stderr, "usage: icb [-eV] [-l login] [-n nick] [-k env] "
-			"[-c status] [-d dir] [--] group\n");
-	exit(ret);
-}
-
-
 int
 main(int argc, char **argv)
 {
@@ -697,12 +687,16 @@ main(int argc, char **argv)
 	argc -= optind;
 	argv += optind;
 
-	if (!argc--)
-		usage(1);
+	if (!argc--) {
+		fprintf(stderr, USAGE, getprogname());
+		return 1;
+	}
 	group = *argv++;
 
-	if (argc)
-		usage(1);
+	if (argc) {
+		fprintf(stderr, USAGE, getprogname());
+		return 1;
+	}
 
 	if ((host = getenv("TCPREMOTEHOST")) == NULL) {
 		host = getenv("TCPREMOTEIP");
