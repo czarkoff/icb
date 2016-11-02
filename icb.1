@@ -23,6 +23,7 @@
 .Op Fl eV
 .Op Fl c Ar status
 .Op Fl d Ar dir
+.Op Fl i Ar types
 .Op Fl k Ar env
 .Op Fl l Ar login
 .Op Fl n Ar nick
@@ -77,7 +78,10 @@ In this mode
 .Nm
 will not split message into smaller messages, but will send it in multiple
 packets with length 0.
-.Fl k Ar env
+.It Fl i Ar types
+Ignore ICB packets of specified
+.Ar types .
+.It Fl k Ar env
 Get ICB account's password from
 .Ar env
 environment variable.

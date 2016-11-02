@@ -17,8 +17,8 @@
 #define READ_FD		6
 #define WRITE_FD	7
 
-#define USAGE		"usage: %s [-eV] [-l login] [-n nick] [-k env] " \
-			"[-c status] [-d dir] [--] group\n"
+#define USAGE		"usage: %s [-eV] [-c status] [-d dir] [-i types ] " \
+			"[-k env] [-l login] [-n nick] [--] group\n"
 
 #define PKT_SZ		256
 #define OUT_SZ		PKT_SZ * 2
@@ -59,6 +59,7 @@ ssize_t cmd_len = 0;
 char root[PATH_MAX];
 char *group = NULL;
 char *nick = NULL;
+char *ignore = "";
 int quit = -1;
 int extension = PKT_SZ - 1;
 
@@ -162,6 +163,11 @@ handle_server(void)
 		return -1;
 
 	if (len == 0)
+		return 0;
+	else if (len < 2)
+		return -1;
+
+	if (strchr(ignore, buf[1]))
 		return 0;
 
 	if (buf[len - 1] != '\0')
@@ -651,7 +657,7 @@ main(int argc, char **argv)
 	login = pw->pw_name;
 	(void)snprintf(prefix, PATH_MAX, "%s/%s", pw->pw_dir, "icb");
 
-	while ((c = getopt(argc, argv, "c:d:ehk:l:n:V")) != -1) {
+	while ((c = getopt(argc, argv, "c:d:ehi:k:l:n:V")) != -1) {
 		switch (c) {
 			case 'c':
 				status = optarg;
@@ -666,12 +672,15 @@ main(int argc, char **argv)
 			case 'h':
 				fprintf(stdout, USAGE, getprogname());
 				return 0;
-			case 'l':
-				login = optarg;
+			case 'i':
+				ignore = optarg;
 				break;
 			case 'k':
 				if ((password = getenv(optarg)) == NULL)
 					err(1, NULL);
+				break;
+			case 'l':
+				login = optarg;
 				break;
 			case 'n':
 				nick = optarg;
