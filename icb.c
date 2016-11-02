@@ -234,9 +234,10 @@ struct chat *
 init_chat(const char *name)
 {
 	struct chat *c;
+	struct stat sb;
 	char infile[PATH_MAX];
 	char outfile[PATH_MAX];
-	int fd;
+	int save_errno;
 
 	if (strnlen(name, PKT_SZ) >= PKT_SZ) {
 		errno = ENAMETOOLONG;
@@ -245,8 +246,6 @@ init_chat(const char *name)
 
 	if ((c = malloc(sizeof(struct chat))) == NULL)
 		return NULL;
-
-	c->last = 0;
 
 	if (strncmp(name, "", 1) == 0)
 		(void)snprintf(c->name, PKT_SZ, "#%s", group);
@@ -281,9 +280,21 @@ init_chat(const char *name)
 		free(c);
 		return NULL;
 	}
-
-	/* create output file and close it immediately */
-	close(open(outfile, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR));
+	(void)memset(&sb, '\0', sizeof(struct stat));
+	if (stat(outfile, &sb) == 0) {
+		c->last = sb.st_mtim.tv_sec;
+	} else if (errno == ENOENT) {
+		/* create output file and close it immediately */
+		(void)close(open(outfile, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR));
+		c->last = 0;
+	} else {
+		save_errno = errno;
+		(void)close(c->in);
+		(void)unlink(infile);
+		free(c);
+		errno = save_errno;
+		return NULL;
+	}
 
 	c->next = NULL;
 	
