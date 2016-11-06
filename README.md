@@ -30,6 +30,7 @@ The following flags are available:
 | `-k env` | Get ICB account's password from *env* environment variable. |
 | `-l login` | Use *login* for login name when connecting. Defaults to system user name. |
 | `-n nick` | Set nick name to *nick*. Defaults to login name. |
+| `-s server` | Set server component of direcotry tree to *server*.  As `icb` does no networking on its own, this parameter does not influence the network connection.  Default value is read from `REMOTEHOST` environment variable, which should be set by UCSPI-complient tool. |
 | `-V` | Show version information and exit. |
 
 Following commands are interpreted specially when recieved from group FIFO:

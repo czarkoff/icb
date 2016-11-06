@@ -658,7 +658,7 @@ main(int argc, char **argv)
 	char prefix[PATH_MAX];
 	char *login = NULL;
 	char *password = "";
-	char *host;
+	char *host = NULL;
 	char *status = "";
 	int c;
 	struct passwd *pw;
@@ -696,6 +696,9 @@ main(int argc, char **argv)
 			case 'n':
 				nick = optarg;
 				break;
+			case 's':
+				host = optarg;
+				break;
 			case 'V':
 				fprintf(stdout, "icb " VERSION "\n");
 				return 0;
@@ -718,7 +721,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	if ((host = getenv("TCPREMOTEHOST")) == NULL) {
+	if (host == NULL && (host = getenv("TCPREMOTEHOST")) == NULL) {
 		host = getenv("TCPREMOTEIP");
 		if (strlen(host) == 0)
 			errx(1, "remote hostname unknown");

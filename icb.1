@@ -27,6 +27,7 @@
 .Op Fl k Ar env
 .Op Fl l Ar login
 .Op Fl n Ar nick
+.Op Fl s Ar server
 .Ar group
 .Sh DESCRIPTION
 .Nm
@@ -94,6 +95,16 @@ Defaults to system user name.
 Set nick name to
 .Ar nick .
 Defaults to login name.
+.It Fl s Ar server
+Set server component of direcotry tree to
+.Ar server .
+As
+.Nm
+does no networking on its own, this parameter does not influence the network
+connection.
+Default value is read from
+.Ev REMOTEHOST
+environment variable, which should be set by UCSPI-complient tool.
 .It Fl V
 Show version information and exit.
 .El
