@@ -606,7 +606,7 @@ int
 send_msg(int type, char *cmd)
 {
 	char msg[PKT_SZ], *base = msg;
-	size_t len, rem;
+	size_t len = 2, rem;
 	int msgs = 0;
 
 	*base++ = 'L';
