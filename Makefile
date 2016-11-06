@@ -1,6 +1,6 @@
 sinclude config.mk
 
-V = 0.1
+V = 0.2
 
 CC                   ?= cc
 LD                   := ${CC}
