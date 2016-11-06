@@ -107,7 +107,7 @@ handle_input(struct chat *c)
 	char tbuf[PIPE_BUF * 2];
 	char out[OUT_SZ];
 	size_t i;
-	char *bufp, *arg;
+	char *arg, *to;
 	char path[PATH_MAX];
 
 	for (i = 0; i < PIPE_BUF; i++) {
@@ -127,10 +127,14 @@ handle_input(struct chat *c)
 
 	if (c == chats) {
 		if (strncmp(buf, ":m ", 3) == 0) {
-			snprintf(tbuf, sizeof(tbuf), "m\001%s", buf + 3);
+			to = buf + 3;
+			if ((arg = strchr(to, ' ')) == NULL)
+				return 0;
+			snprintf(tbuf, sizeof(tbuf), "m\001%s", to);
 			send_msg('h', tbuf);
+			*arg++ = '\0';
 			(void)snprintf(out, OUT_SZ, "%s: %s", nick, arg);
-			print_chat(bufp, out);
+			print_chat(to, out);
 		} else if (strncmp(buf, ":c ", 3) == 0) {
 			send_command(buf + 3);
 		} else if (strncmp(buf, ":p", 3) == 0) {
@@ -143,7 +147,7 @@ handle_input(struct chat *c)
 			print_chat(c->name, out);
 		}
 	} else {
-		snprintf(tbuf, PIPE_BUF * 2, "m%s %s", c->name, buf);
+		snprintf(tbuf, PIPE_BUF * 2, "m\001%s %s", c->name, buf);
 		send_msg('h', tbuf);
 		(void)snprintf(out, OUT_SZ, "%s: %s", nick, buf);
 		print_chat(c->name, out);
@@ -181,7 +185,7 @@ handle_server(void)
 
 	switch (*bufp++) {
 		case 'c':
-			(void)strlcpy(name, chats->name, PKT_SZ);
+			(void)strlcpy(name, bufp, PKT_SZ);
 			/* FALLTHROUGH */
 		case 'b':
 			if (arg == NULL)
@@ -668,7 +672,7 @@ main(int argc, char **argv)
 	login = pw->pw_name;
 	(void)snprintf(prefix, PATH_MAX, "%s/%s", pw->pw_dir, "icb");
 
-	while ((c = getopt(argc, argv, "c:d:ehi:k:l:n:V")) != -1) {
+	while ((c = getopt(argc, argv, "c:d:ehi:k:l:n:s:V")) != -1) {
 		switch (c) {
 			case 'c':
 				status = optarg;
