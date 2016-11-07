@@ -40,8 +40,8 @@ void close_chats(void);
 int handle_input(struct chat *);
 int handle_server(void);
 struct chat *init_chat(const char *);
-int log_in(char *, char *, char *, char *, char *);
-int mkdirr(char *);
+int log_in(char *, char *, char *);
+int loop(void);
 struct chat *open_chat(const char *);
 void ping(void);
 void pong(void);
@@ -307,7 +307,7 @@ init_chat(const char *name)
 
 
 int
-log_in(char *login, char *nick, char *group, char *password, char *status)
+log_in(char *login, char *password, char *status)
 {
 	char buf[PKT_SZ];
 
@@ -434,7 +434,7 @@ print_chat(char *name, char *msg)
 {
 	struct chat *c = open_chat(name);
 	time_t t;
-	char ts[DATE_LEN];
+	char tsp[DATE_LEN];
 	char file[PATH_MAX];
 	int fd;
 
@@ -448,12 +448,12 @@ print_chat(char *name, char *msg)
 	if ((t = time(NULL)) == (time_t)-1)
 		return -1;
 	if (t / DAY != c->last / DAY)
-		strftime(ts, DATE_LEN, "%F\n%T", localtime(&t));
+		strftime(tsp, DATE_LEN, "%F\n%T", localtime(&t));
 	else
-		strftime(ts, DATE_LEN, "%T", localtime(&t));
+		strftime(tsp, DATE_LEN, "%T", localtime(&t));
 	c->last = t;
 
-	(void)dprintf(fd, "%s %s\n", ts, msg);
+	(void)dprintf(fd, "%s %s\n", tsp, msg);
 
 	return close(fd);
 }
@@ -462,7 +462,7 @@ print_chat(char *name, char *msg)
 void
 print_command(char *command)
 {
-	char *rank, *nick, *pidle, *pdate, *user, *host, *group, *topic;
+	char *rank, *pidle, *pdate, *user, *host, *topic;
 	unsigned long idle;
 	char unit;
 	time_t date;
@@ -736,7 +736,7 @@ main(int argc, char **argv)
 	if (nick == NULL)
 		nick = login;
 
-	if (log_in(login, nick, group, password, status) == -1)
+	if (log_in(login, password, status) == -1)
 		err(1, NULL);
 
 	if (mkdir(prefix, S_IRWXU) == -1 && errno != EEXIST)
